@@ -3,8 +3,11 @@ name: Generate and Push PDF from README
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
-  workflow_dispatch:  # Allow manual trigger
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write  # Grants write access to contents like files and commits
 
 jobs:
   build:
@@ -14,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
+      - name: Install Pandoc and wkhtmltopdf
         run: |
           sudo apt-get update
           sudo apt-get install -y pandoc wkhtmltopdf
