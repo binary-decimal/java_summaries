@@ -7,33 +7,26 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Grants permission to push the PDF back to the repo
+  contents: write  # Grants write access to contents like files and commits
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18  # Use a stable Node.js version
+      - name: Install Pandoc and wkhtmltopdf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc wkhtmltopdf
 
-      # Step 3: Install md-to-pdf
-      - name: Install md-to-pdf
-        run: npm install -g md-to-pdf
+      - name: Convert Markdown to PDF
+        run: |
+          pandoc README.md -o README.pdf --pdf-engine=wkhtmltopdf
 
-      # Step 4: Convert Markdown to PDF
-      - name: Convert README.md to PDF
-        run: md-to-pdf README.md --output README.pdf
-
-      # Step 5: Push the PDF to the repository
-      - name: Commit and Push PDF
+      - name: Commit and Push the PDF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
