@@ -22,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Use a stable Node.js version
+          node-version: 18
 
       # Step 3: Install md-to-pdf
       - name: Install md-to-pdf
@@ -30,7 +30,9 @@ jobs:
 
       # Step 4: Convert Markdown to PDF
       - name: Convert README.md to PDF
-        run: md-to-pdf README.md --output README.pdf
+        run: |
+          md-to-pdf README.md
+          mv README.pdf output/README.pdf  # Optional: rename or move the file
 
       # Step 5: Push the PDF to the repository
       - name: Commit and Push PDF
@@ -40,7 +42,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add README.pdf
+          git add output/README.pdf
           git commit -m "Generated README.pdf from README.md [skip ci]" || echo "No changes to commit"
           git push
 
