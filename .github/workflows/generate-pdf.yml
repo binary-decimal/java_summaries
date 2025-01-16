@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Grants permission to push the PDF back to the repo
+  contents: write  # Allows the workflow to commit the PDF back to the repo
 
 jobs:
   build:
@@ -18,23 +18,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      # Step 2: Set up LaTeX
+      - name: Install LaTeX
+        run: sudo apt-get update && sudo apt-get install -y texlive-xetex
 
-      # Step 3: Install md-to-pdf
-      - name: Install md-to-pdf
-        run: npm install -g md-to-pdf
-
-      # Step 4: Convert Markdown to PDF
-      - name: Convert README.md to PDF
+      # Step 3: Convert Markdown to PDF using LaTeX
+      - name: Convert Markdown to PDF
         run: |
-          md-to-pdf README.md
-          mv README.pdf output/README.pdf  # Optional: rename or move the file
+          pandoc README.md -o README.pdf --pdf-engine=xelatex
 
-      # Step 5: Push the PDF to the repository
+      # Step 4: Push the generated PDF to the repository
       - name: Commit and Push PDF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,7 +35,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add output/README.pdf
+          git add README.pdf
           git commit -m "Generated README.pdf from README.md [skip ci]" || echo "No changes to commit"
           git push
 
