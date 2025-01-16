@@ -18,16 +18,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up LaTeX
-      - name: Install LaTeX
-        run: sudo apt-get update && sudo apt-get install -y texlive-xetex
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-      # Step 3: Convert Markdown to PDF using LaTeX
-      - name: Convert Markdown to PDF
+      # Step 3: Install md-to-pdf
+      - name: Install md-to-pdf
+        run: npm install -g md-to-pdf
+
+      # Step 4: Convert Markdown to PDF (with --no-sandbox flag)
+      - name: Convert README.md to PDF
+        env:
+          PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome"  # Use system Chromium, if needed
         run: |
-          pandoc README.md -o README.pdf --pdf-engine=xelatex
+          echo '{ "puppeteer": { "args": ["--no-sandbox"] } }' > md-to-pdf.config.json
+          md-to-pdf README.md --config-file md-to-pdf.config.json
 
-      # Step 4: Push the generated PDF to the repository
+      # Step 5: Push the generated PDF to the repository
       - name: Commit and Push PDF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
