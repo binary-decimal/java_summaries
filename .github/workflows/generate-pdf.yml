@@ -3,10 +3,10 @@ name: Generate PDF from README
 on:
   push:
     branches:
-      - main  # Запускается при пуше в ветку main
+      - main  # Runs on push to the main branch
   pull_request:
     branches:
-      - main  # Запускается при создании PR в ветку main
+      - main  # Runs on PR to the main branch
 
 jobs:
   build:
@@ -15,19 +15,19 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-    
+
     - name: Set up LaTeX
       run: |
         sudo apt-get update
         sudo apt-get install -y texlive-xetex
         sudo apt-get install -y pandoc
-    
+
     - name: Convert README.md to PDF
       run: |
         pandoc README.md -o README.pdf
 
     - name: Upload PDF as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: README-pdf
         path: README.pdf
